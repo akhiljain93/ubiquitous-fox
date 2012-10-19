@@ -3,21 +3,39 @@ public class Cache
 	public class Set
 	{
 		int assoc;
-		int[] arr;
-		int tagLength;
-		public Set(int assoc, int tag)
+		Integer[] arr;
+		boolean fifo;
+		
+		public Set(int assoc, boolean fifo)
 		{
 			this.assoc = assoc;
-			arr = new int[assoc];
-			tagLength = tag;
+			arr = new Integer[assoc];
+			this.fifo = fifo;
 		}
-		public boolean matchTag(int Tag)
+		
+		public boolean matchTag(int tag)
 		{
 			for (int i=0; i<assoc; i++)
-				if (arr[i] % (1<<assoc) == Tag)
+				if (arr[i] != null && (arr[i] >> 1) == tag)	{
+					if(!fifo)	{
+						Integer a = arr[i];
+						for(int j = i-1; j >= 0; --j)
+							arr[j+1] = arr[j];
+						arr[0] = a;
+					}
 					return true;
+				}
 			return false;
-		}	
+		}
+		
+		public boolean replace(int tag)	{
+			if(matchTag(tag))
+				return false;
+			for(int j = assoc-2; j >= 0; --j)
+				arr[j+1] = arr[j];
+			arr[0] = tag << 1;
+			return true;
+		}
 	}
 	public class L1
 	{
@@ -25,7 +43,7 @@ public class Cache
 		public L1()
 		{
 			for (int i=0; i<512; i++)
-				L1[i] = new Set(2, 18);
+				L1[i] = new Set(2, true);
 		}
 		public boolean searchL1(int Tag, int index)
 		{
@@ -33,7 +51,7 @@ public class Cache
 		}
 		public void goToL2(int Tag, int index)
 		{
-			if (!searchL1(Tag, index))
+			//if (!searchL1(Tag, index))
 				
 		}
 	}	
@@ -43,7 +61,7 @@ public class Cache
 		public L2()
 		{
 			for (int i=0; i<2048; i++)
-				L2[i] = new Set(8, 14);
+				L2[i] = new Set(8, false);
 		}
 		public boolean searchL2(int Tag, int index)
 		{
