@@ -38,11 +38,13 @@ public class Cache
 			return modified;
 		}
 	}
+	
 	public class L1
 	{
-		Set[] L1 = new Set[512];
+		Set[] L1;
 		public L1()
 		{
+			L1 = new Set[512];
 			for (int i=0; i<512; i++)
 				L1[i] = new Set(2, true);
 		}
@@ -50,12 +52,8 @@ public class Cache
 		{
 			return L1[index].matchTag(Tag);
 		}
-		public void goToL2(int Tag, int index)
-		{
-			//if (!searchL1(Tag, index))
-				
-		}
-	}	
+	}
+	
 	public class L2
 	{
 		Set[] L2 = new Set[2048];
@@ -70,4 +68,13 @@ public class Cache
 		}
 		
 	}
+	
+	L1 cl1 = new L1();
+	L2 cl2 = new L2();
+	
+	public int access(int addr, boolean write)	{
+		
+		return 1;
+	}
+	
 }
