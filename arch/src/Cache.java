@@ -48,8 +48,11 @@ public class Cache
 			for (int i=0; i<512; i++)
 				L1[i] = new Set(2, true);
 		}
-		public boolean searchL1(int Tag, int index)
+		public boolean searchL1(int Tag)
 		{
+			Tag>>=5;
+			int index=Tag%512;
+			Tag>>=9;
 			return L1[index].matchTag(Tag);
 		}
 	}
@@ -62,8 +65,11 @@ public class Cache
 			for (int i=0; i<2048; i++)
 				L2[i] = new Set(8, false);
 		}
-		public boolean searchL2(int Tag, int index)
+		public boolean searchL2(int Tag)
 		{
+			Tag>>=7;
+			int index=Tag%2048;
+			Tag>>=11;
 			return L2[index].matchTag(Tag);
 		}
 		
