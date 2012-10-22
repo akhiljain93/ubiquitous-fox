@@ -141,7 +141,6 @@ public class BranchPrediction {
 		pc %= size;
 		arr[pc].g.train(pc, outcome);
 		arr[pc].b.train(pc, outcome);
-
 		boolean bpred = bResultQ.pop();
 		arr[pc].c.train(bpred, bpred ^ gResultQ.pop());
 	}
