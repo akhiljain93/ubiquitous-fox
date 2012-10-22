@@ -92,25 +92,25 @@ public class Cache
 			L2[L2tags[1]].setWritten(L2tags[0]);	
 			return 9;
 		}
-        
-        // not present in L1 but in L2
-        if ( L2[L2tags[1]].matchTag(L2tags[0]) )    {
-            
-            // take it to L1
-            L1[L1tags[1]].replace(L1tags[0]);
-            
-            if(write)
-                L2[L2tags[1]].setWritten(L2tags[0]);
-            
-            return 9;
-        }
-        
-        // present in neither
+		
+		// not present in L1 but in L2
+		if ( L2[L2tags[1]].matchTag(L2tags[0]) )    {
+		    
+			// take it to L1
+			L1[L1tags[1]].replace(L1tags[0]);
+			
+			if(write)
+			    L2[L2tags[1]].setWritten(L2tags[0]);
+			
+			return 9;
+		}
+		
+		// present in neither
 		// take it to both L2 and L1, taking care of write-back eviction in L2
-        L1[L1tags[1]].replace(L1tags[0]);
+		L1[L1tags[1]].replace(L1tags[0]);
         
         if (write)
-            return L2[L2tags[1]].setWritten(L2tags[0]) ? 409 : 209;       
+        	return L2[L2tags[1]].setWritten(L2tags[0]) ? 409 : 209;       
 		return L2[L2tags[1]].replace(L2tags[0]) ? 409 : 209;
 	}
 }
