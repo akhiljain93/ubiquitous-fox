@@ -109,8 +109,8 @@ public class Cache
 		// take it to both L2 and L1, taking care of write-back eviction in L2
 		L1[L1tags[1]].replace(L1tags[0]);
         
-        if (write)
-        	return L2[L2tags[1]].setWritten(L2tags[0]) ? 409 : 209;       
+		if (write)
+			return L2[L2tags[1]].setWritten(L2tags[0]) ? 409 : 209;       
 		return L2[L2tags[1]].replace(L2tags[0]) ? 409 : 209;
 	}
 }
