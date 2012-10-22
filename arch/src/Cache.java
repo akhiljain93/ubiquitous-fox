@@ -32,7 +32,7 @@ public class Cache
 		public boolean replace(int tag)	{
 			if(matchTag(tag))
 				return false;
-			boolean modified = (arr[assoc-1] & 1) == 1;
+			boolean modified = (arr[assoc-1] != null) && ((arr[assoc-1] & 1) == 1);
 			for(int j = assoc-2; j >= 0; --j)
 				arr[j+1] = arr[j];
 			arr[0] = tag << 1;
