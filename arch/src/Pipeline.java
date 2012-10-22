@@ -53,6 +53,22 @@ public class Pipeline {
 			}
 			pipeline[0] = latest;
 
+			if (pipeline[1] != null && pipeline[1].type == 0) {// Load Use
+																// Hazard..Stall
+																// always except
+																// consecutive
+																// load
+																// load/store
+																// case
+				if (pipeline[0] != null
+						&& (pipeline[0].type != 0 || pipeline[0].type != 1)
+						&& (pipeline[0].rd == pipeline[1].rs || pipeline[0].rd == pipeline[1].rt)) {
+					pipeline[0]=null;
+					bubble_counter+=1;
+					i--;
+				}
+
+			}
 			if (pipeline[0] != null && pipeline[0].type == 3) {// in IF stage
 																// ,if ins is
 																// branch ..ask
@@ -86,9 +102,9 @@ public class Pipeline {
 					&& pipeline[3].type != 3) {
 
 			}
-			// TODO Load Use Hazard
+
 			clock += 1;// adding 1 to clock at each iteration
 		}
-	}
 
+	}
 }
