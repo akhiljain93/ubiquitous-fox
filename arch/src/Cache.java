@@ -46,7 +46,7 @@ public class Cache
 				L1[i] = new Set(2, true);
 		}
 		public boolean searchL1(int Tag, int index)
-		{
+		{ 
 			return L1[index].matchTag(Tag);
 		}
 		public void goToL2(int Tag, int index)
