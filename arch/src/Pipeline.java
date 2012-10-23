@@ -19,7 +19,7 @@ public class Pipeline {
 		while (true) {// maintain a loop running through the entire ins file
 			latch latest = null;
 			
-			if (bubbles != 0); 			// if bubbles !=0 insert bubble to stall
+			if (bubbles != 0); 			// if bubbles !=0 insert bubble
 			// don't read
 			
 			else if (dont_read) 		// set when a load-use hazard occured in the previous cycle
