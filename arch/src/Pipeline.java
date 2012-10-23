@@ -4,7 +4,7 @@ import java.io.FileReader;
 
 class latch {
 	int type,		// 0 for Load,1 for Store,2 for ALU,3 for Branch
-		rs, rd, rt, pc;
+		rs, rd, rt, pc,mem;
 	boolean branch;// branch outcome
 }
 
@@ -40,6 +40,7 @@ public class Pipeline {
 				latest.rt = 0;		// register target from ins file
 				latest.rd = 0;		// register destination from ins file
 				latest.pc = 0;		// TODO pc is in hex in the file..
+				latest.mem=0;		//mem from trace file
 				latest.branch = true;// branch outcome from trace file...true for taken
 			}
 			
@@ -73,7 +74,7 @@ public class Pipeline {
 			/*******MEM*******/
 			if (pipe[3] != null && pipe[3].type < 2)
 				// ? Load : Store
-				clock += pipe[3].type == 0 ? cache.access(pipe[3].rs + pipe[3].rt, false) : cache.access(pipe[3].rs + pipe[3].rd, true);
+				clock += pipe[3].type == 0 ? cache.access(pipe[3].mem, false) : cache.access(pipe[3].mem, true);
 			else
 				clock ++;		// cycle anyways complete
 		}
