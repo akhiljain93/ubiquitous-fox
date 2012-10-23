@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+
 class latch {
 	int type,		// 0 for Load,1 for Store,2 for ALU,3 for Branch
 		rs, rd, rt, pc;
@@ -5,8 +9,8 @@ class latch {
 }
 
 public class Pipeline {
-
-	public static void main(String[] args) {
+	
+	public static void main(String[] args) throws FileNotFoundException {
 		int clock = 0;					// no. of clock cycles taken
 		int bubbles = 0;				// maintain a bubble counter
 		latch[] pipe = new latch[5];	// array of latches in the pipeline..(To form a circular queue or something later) TODO
@@ -15,6 +19,9 @@ public class Pipeline {
 		BranchPrediction predictor = new BranchPrediction();
 		Cache cache = new Cache();
 		boolean dont_read = false;
+		
+		BufferedReader ex = new BufferedReader(new FileReader("exec_trace.txt")); //for execution trace
+		BufferedReader in = new BufferedReader(new FileReader("inst_trace.txt")); //for instruction file
 		
 		while (true) {// maintain a loop running through the entire ins file
 			latch latest = null;
