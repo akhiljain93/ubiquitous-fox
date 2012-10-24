@@ -49,7 +49,7 @@ public class Pipeline {
 				break;
 			StringTokenizer st = new StringTokenizer(s);
 			Instructions ins = new Instructions();
-			ins.pc = (int) Long.parseLong(st.nextToken(), 16);
+			ins.pc = (int) Long.parseLong(st.nextToken().substring(2), 16);
 			int key = (ins.pc % TABLE_SIZE + TABLE_SIZE) % TABLE_SIZE;
 			ins.type = Integer.parseInt(st.nextToken());
 			ins.rs = Integer.parseInt(st.nextToken());
