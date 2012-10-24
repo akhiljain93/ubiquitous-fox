@@ -50,6 +50,7 @@ public class Cache {
 	}
 
 	Set[] L1, L2;
+	int forL1, forL2, missL1, missL2;
 
 	public Cache() {
 		L1 = new Set[512];
@@ -79,6 +80,7 @@ public class Cache {
 	public int access(int addr, boolean write) {
 		int[] L1tags = getL1tag(addr), L2tags = getL2tag(addr);
 
+		forL1++;
 		// present in L1
 		if (L1[L1tags[1]].matchTag(L1tags[0])) {
 			if (!write)
@@ -88,8 +90,9 @@ public class Cache {
 			L2[L2tags[1]].setWritten(L2tags[0]);
 			return 9;
 		}
-
 		// not present in L1 but in L2
+		missL1++;
+		forL2++;
 		if (L2[L2tags[1]].matchTag(L2tags[0])) {
 
 			// take it to L1
@@ -100,13 +103,20 @@ public class Cache {
 
 			return 9;
 		}
-
 		// present in neither
+		missL2++;
 		// take it to both L2 and L1, taking care of write-back eviction in L2
 		L1[L1tags[1]].replace(L1tags[0]);
 
 		if (write)
 			return L2[L2tags[1]].setWritten(L2tags[0]) ? 409 : 209;
 		return L2[L2tags[1]].replace(L2tags[0]) ? 409 : 209;
+	}
+	
+	public int L1LocalMiss()	{
+		return (100 * missL1) / forL1;
+	}
+	public int L2LocalMiss()	{
+		return (100 * missL2) / forL2;
 	}
 }

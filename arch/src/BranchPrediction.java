@@ -9,8 +9,8 @@ class accuracyMeter {
 		total++;
 	}
 
-	public float givAcc() {
-		return (float) correct / (float) total;
+	public int givAcc() {
+		return (100 * correct) / total;
 	}
 }
 

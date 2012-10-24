@@ -8,11 +8,8 @@ import java.util.StringTokenizer;
 class Instructions {
 
 	int		pc, type, rs, rt, rd, mem;
-	boolean	branch;					// outcome of branch
+	boolean	branch = true;					// outcome of branch
 
-	Instructions() {
-		branch = true;
-	}
 }
 
 public class Pipeline {
@@ -39,17 +36,18 @@ public class Pipeline {
 		final int TABLE_SIZE = Integer.MAX_VALUE / 16;
 		// hash table to store all instructions in the instruction file
 		LinkedList<Instructions> hashTable[] = (LinkedList<Instructions>[]) new LinkedList[TABLE_SIZE];
+		// TODO dude! a linkedlist of linkedlists! wtf!
+		
 
 		// preprocessing of the inst file
 		for (int i = 0; i < TABLE_SIZE; i++)
 			hashTable[i] = new LinkedList<Instructions>();
-		while (true) {
-			String s = in.readLine();
-			if (s == null)
-				break;
+		String s;
+		while ((s = in.readLine()) != null) {
 			StringTokenizer st = new StringTokenizer(s);
 			Instructions ins = new Instructions();
 			ins.pc = (int) Long.parseLong(st.nextToken().substring(2), 16);
+			// same as the next TODO 
 			int key = (ins.pc % TABLE_SIZE + TABLE_SIZE) % TABLE_SIZE;
 			ins.type = Integer.parseInt(st.nextToken());
 			ins.rs = Integer.parseInt(st.nextToken());
@@ -60,9 +58,9 @@ public class Pipeline {
 		in.close();
 
 		int last = 0, dinst = 0;
-		while (last < 4) {			
+		while (last < 4) {
 			// maintain a loop running through the entire ins file
-			if(last > 0)
+			if (last > 0)
 				last++;
 			dinst++;
 			Instructions latest = null;
@@ -130,7 +128,7 @@ public class Pipeline {
 		}
 
 		ex.close();
-		System.out.println((dinst/clock)+" ");
+		System.out.println(((float)dinst / (float)clock) + " " + cache.L1LocalMiss() + "% " + cache.L2LocalMiss() + "% " + predictor.meter.givAcc() + "%");
 
 	}
 }
