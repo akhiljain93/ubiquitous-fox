@@ -50,7 +50,7 @@ public class Cache {
 	}
 
 	Set[] L1, L2;
-	int forL1, forL2, missL1, missL2;
+	long forL1, forL2, missL1, missL2;
 
 	public Cache() {
 		L1 = new Set[512];
@@ -61,23 +61,23 @@ public class Cache {
 			L2[i] = new Set(8, false);
 	}
 
-	public int[] getL1tag(int addr) {
-		int remn = addr % 32; // 32 byte block size
-		int tag = addr >> 5;
+	public int[] getL1tag(long addr) {
+		int remn = (int)(addr % 32); // 32 byte block size
+		int tag = (int)(addr >> 5);
 		int index = tag % 512; // 9 bit index
 		tag >>= 9;
 		return new int[] { tag, index, remn };
 	}
 
-	public int[] getL2tag(int addr) {
-		int remn = addr % 128; // 128 byte block size
-		int tag = addr >> 7;
+	public int[] getL2tag(long addr) {
+		int remn = (int)(addr % 128); // 128 byte block size
+		int tag = (int)(addr >> 7);
 		int index = tag % 2048;
 		tag >>= 11;
 		return new int[] { tag, index, remn };
 	}
 
-	public int access(int addr, boolean write) {
+	public int access(long addr, boolean write) {
 		int[] L1tags = getL1tag(addr), L2tags = getL2tag(addr);
 
 		forL1++;
@@ -114,9 +114,9 @@ public class Cache {
 	}
 	
 	public int L1LocalMiss()	{
-		return (100 * missL1) / forL1;
+		return (int)((100 * missL1) / forL1);
 	}
 	public int L2LocalMiss()	{
-		return (100 * missL2) / forL2;
+		return (int)((100 * missL2) / forL2);
 	}
 }

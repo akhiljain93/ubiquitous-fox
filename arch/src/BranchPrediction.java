@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 
 class accuracyMeter {
-	int correct, total;
+	long correct, total;
 
 	public void update(boolean precision) {
 		if (precision)
@@ -10,7 +10,7 @@ class accuracyMeter {
 	}
 
 	public int givAcc() {
-		return (100 * correct) / total;
+		return (int)((100 * correct) / total);
 	}
 }
 
@@ -53,18 +53,18 @@ public class BranchPrediction {
 				arr[i] = new twoBit();
 		}
 
-		public boolean predict(int pc, boolean outcome) {
+		public boolean predict(long pc, boolean outcome) {
 			pc >>= 2; // testing TODO
 			pc %= size;
-			boolean prediction = arr[pc].predict();
+			boolean prediction = arr[(int)pc].predict();
 			meter.update(prediction == outcome);
 			return prediction;
 		}
 
-		public void train(int pc, boolean outcome) {
+		public void train(long pc, boolean outcome) {
 			pc >>= 2; // testing TODO
 			pc %= size;
-			arr[pc].train(outcome);
+			arr[(int)pc].train(outcome);
 		}
 	}
 
@@ -81,19 +81,19 @@ public class BranchPrediction {
 				arr[i] = new twoBit();
 		}
 
-		public boolean predict(int pc, boolean outcome) {
+		public boolean predict(long pc, boolean outcome) {
 			// pc >>= 2; // testing TODO
 			pc %= size;
-			int r = pc ^ bhr;
+			int r = (int)pc ^ bhr;
 			boolean prediction = arr[r].predict();
 			meter.update(prediction == outcome);
 			return prediction;
 		}
 
-		public void train(int pc, boolean outcome) {
+		public void train(long pc, boolean outcome) {
 			// pc >>= 2; // testing TODO
 			pc %= size;
-			int r = pc ^ bhr;
+			int r = (int)pc ^ bhr;
 			if (outcome)
 				bhr += (1 << 6);
 			bhr >>= 1;
@@ -124,26 +124,26 @@ public class BranchPrediction {
 	private LinkedList<Boolean> gResultQ = new LinkedList<Boolean>(),
 			bResultQ = new LinkedList<Boolean>();
 
-	public boolean predict(int pc, boolean outcome) {
-		// pc >>= 2; //testing TODO
-		pc %= size;
-		boolean gpred = arr[pc].g.predict(pc, outcome), // predictor 1
-		bpred = arr[pc].b.predict(pc, outcome); // predictor 2
+	public boolean predict(long pc, boolean outcome) {
+		int intpc = (int) pc % size;		// Don't change pc!! We need it for b.predict and g.predict as well!!
+		// intpc >>= 2; //testing TODO
+		boolean gpred = arr[intpc].g.predict(pc, outcome), // predictor 1
+		bpred = arr[intpc].b.predict(pc, outcome); // predictor 2
 		gResultQ.add(gpred);
 		bResultQ.add(bpred);
-		boolean prediction = arr[pc].c.predict() ? bpred : gpred;
+		boolean prediction = arr[intpc].c.predict() ? bpred : gpred;
 		meter.update(prediction == outcome);
 		return prediction;
 	}
 
-	public void train(int pc, boolean outcome) {
-		// pc >>= 2; //testing TODO
-		pc %= size;
-		arr[pc].g.train(pc, outcome);
-		arr[pc].b.train(pc, outcome);
+	public void train(long pc, boolean outcome) {
+		int intpc = (int)pc % size;
+		// intpc >>= 2; //testing TODO
+		arr[intpc].g.train(pc, outcome);
+		arr[intpc].b.train(pc, outcome);
 
 		boolean bpred = bResultQ.pop();
-		arr[pc].c.train(bpred, bpred ^ gResultQ.pop());
+		arr[intpc].c.train(bpred, bpred ^ gResultQ.pop());
 	}
 
 }

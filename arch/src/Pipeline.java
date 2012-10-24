@@ -7,8 +7,9 @@ import java.util.StringTokenizer;
 
 class Instructions {
 
-	int		pc, type, rs, rt, rd, mem;
-	boolean	branch = true;					// outcome of branch
+	int		type, rs, rt, rd;
+	long	pc, mem;
+	boolean	branch	= true;	// outcome of branch
 
 }
 
@@ -31,14 +32,10 @@ public class Pipeline {
 		BufferedReader ex = new BufferedReader(new FileReader("exec_trace.txt")); // for execution trace
 		BufferedReader in = new BufferedReader(new FileReader("inst_trace.txt")); // for instruction file
 
-		// TODO
-		// MAX_VALUE/16 was the best my machine could support, anyone knows how to increase the length of the array??
-		final int TABLE_SIZE = Integer.MAX_VALUE / 16;
+		final int TABLE_SIZE = 100000007;
 		// hash table to store all instructions in the instruction file
 		LinkedList<Instructions> hashTable[] = (LinkedList<Instructions>[]) new LinkedList[TABLE_SIZE];
-		// TODO dude! a linkedlist of linkedlists! wtf!
 		
-
 		// preprocessing of the inst file
 		for (int i = 0; i < TABLE_SIZE; i++)
 			hashTable[i] = new LinkedList<Instructions>();
@@ -46,9 +43,8 @@ public class Pipeline {
 		while ((s = in.readLine()) != null) {
 			StringTokenizer st = new StringTokenizer(s);
 			Instructions ins = new Instructions();
-			ins.pc = (int) Long.parseLong(st.nextToken().substring(2), 16);
-			// same as the next TODO 
-			int key = (ins.pc % TABLE_SIZE + TABLE_SIZE) % TABLE_SIZE;
+			ins.pc = Long.parseLong(st.nextToken().substring(2), 16);
+			int key = (int) (ins.pc % TABLE_SIZE);
 			ins.type = Integer.parseInt(st.nextToken());
 			ins.rs = Integer.parseInt(st.nextToken());
 			ins.rt = Integer.parseInt(st.nextToken());
@@ -57,7 +53,7 @@ public class Pipeline {
 		}
 		in.close();
 
-		int last = 0, dinst = 0;
+		long last = 0, dinst = 0;
 		while (last < 4) {
 			// maintain a loop running through the entire ins file
 			if (last > 0)
@@ -78,17 +74,17 @@ public class Pipeline {
 					last++;
 				else {
 					StringTokenizer st = new StringTokenizer(line);
-					int pc = (int) Long.parseLong(st.nextToken().substring(2), 16);
-
-					// TODO why is this needed? isn't pc always positive?
-					int key = (pc % TABLE_SIZE + TABLE_SIZE) % TABLE_SIZE;
+					long pc = Long.parseLong(st.nextToken().substring(2), 16);
+					int key = (int) (pc % TABLE_SIZE);
 					Iterator<Instructions> i = hashTable[key].iterator();
 					while (i.hasNext()) {
 						Instructions next = i.next();
-						if (next.pc == pc)
+						if (next.pc == pc)	{
 							latest = next;
+							break;
+						}
 					}
-					latest.mem = (int) Long.parseLong(st.nextToken().substring(2), 16); // mem from trace file
+					latest.mem = Long.parseLong(st.nextToken().substring(2), 16); // mem from trace file
 					latest.branch = (Integer.parseInt(st.nextToken()) == 0) ? false : true;// branch outcome from trace file...true for taken
 				}
 			}
@@ -128,7 +124,7 @@ public class Pipeline {
 		}
 
 		ex.close();
-		System.out.println(((float)dinst / (float)clock) + " " + cache.L1LocalMiss() + "% " + cache.L2LocalMiss() + "% " + predictor.meter.givAcc() + "%");
+		System.out.println(((double) dinst / (double) clock) + " " + cache.L1LocalMiss() + "% " + cache.L2LocalMiss() + "% " + predictor.meter.givAcc() + "%");
 
 	}
 }
