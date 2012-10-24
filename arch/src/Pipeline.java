@@ -131,7 +131,7 @@ public class Pipeline {
 		}
 
 		ex.close();
-		System.out.printf("%.2f %.2f%% %.2f%% %.2f%%",((double) dinst / (double) clock), cache.L1LocalMiss(), cache.L2LocalMiss(), predictor.meter.givAcc());
+		System.out.printf("%.2f %.2f%% %.2f%% %.10f%%",((double) dinst / (double) clock), cache.L1LocalMiss(), cache.L2LocalMiss(), predictor.meter.givAcc());
 
 	}
 }

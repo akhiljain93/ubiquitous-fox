@@ -54,7 +54,7 @@ public class BranchPrediction {
 		}
 
 		public boolean predict(long pc, boolean outcome) {
-			pc >>= 2; // testing TODO
+			//pc >>= 2; // testing TODO
 			pc %= size;
 			boolean prediction = arr[(int)pc].predict();
 			meter.update(prediction == outcome);
@@ -62,7 +62,7 @@ public class BranchPrediction {
 		}
 
 		public void train(long pc, boolean outcome) {
-			pc >>= 2; // testing TODO
+			//pc >>= 2; // testing TODO
 			pc %= size;
 			arr[(int)pc].train(outcome);
 		}
@@ -102,7 +102,7 @@ public class BranchPrediction {
 	}
 
 	/*********** tournament predictor ***********/
-	final static int m = 10;
+	final static int m = 9;
 	static final int size = 1 << m;
 
 	public class tournamentObject {
@@ -126,7 +126,7 @@ public class BranchPrediction {
 
 	public boolean predict(long pc, boolean outcome) {
 		int intpc = (int) pc % size;		// Don't change pc!! We need it for b.predict and g.predict as well!!
-		// intpc >>= 2; //testing TODO
+		//intpc >>= 2; //testing TODO
 		boolean gpred = arr[intpc].g.predict(pc, outcome), // predictor 1
 		bpred = arr[intpc].b.predict(pc, outcome); // predictor 2
 		gResultQ.add(gpred);
@@ -138,7 +138,7 @@ public class BranchPrediction {
 
 	public void train(long pc, boolean outcome) {
 		int intpc = (int)pc % size;
-		// intpc >>= 2; //testing TODO
+		//intpc >>= 2; //testing TODO
 		arr[intpc].g.train(pc, outcome);
 		arr[intpc].b.train(pc, outcome);
 
