@@ -113,10 +113,10 @@ public class Cache {
 		return L2[L2tags[1]].replace(L2tags[0]) ? 409 : 209;
 	}
 	
-	public float L1LocalMiss()	{
-		return (float)((100 * missL1) / forL1);
+	public double L1LocalMiss()	{
+		return ((double)(100 * missL1) / (double)forL1);
 	}
-	public float L2LocalMiss()	{
-		return (float)((100 * missL2) / forL2);
+	public double L2LocalMiss()	{
+		return ((double)(100 * missL2) / (double)forL2);
 	}
 }
