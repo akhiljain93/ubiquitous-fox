@@ -129,7 +129,7 @@ public class BranchPrediction {
 		//intpc >>= 2; //testing TODO
 		boolean gpred = arr[intpc].g.predict(pc, outcome), // predictor 1
 		bpred = arr[intpc].b.predict(pc, outcome); // predictor 2
-		gResultQ.add(gpred);
+		gResultQ.add(gpred); //TODO why do we need a queue?
 		bResultQ.add(bpred);
 		boolean prediction = arr[intpc].c.predict() ? bpred : gpred;
 		meter.update(prediction == outcome);
@@ -143,7 +143,7 @@ public class BranchPrediction {
 		arr[intpc].b.train(pc, outcome);
 
 		boolean bpred = bResultQ.pop();
-		arr[intpc].c.train(bpred, bpred ^ gResultQ.pop());
+		arr[intpc].c.train(bpred, bpred ^ gResultQ.pop()); //TODO please explain this one 
 	}
 
 }
