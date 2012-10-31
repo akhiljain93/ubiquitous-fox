@@ -30,7 +30,7 @@ public class Pipeline {
 		BufferedReader ex = new BufferedReader(new FileReader("exec_trace.txt")); // for execution trace
 		BufferedReader in = new BufferedReader(new FileReader("inst_trace.txt")); // for instruction file
 
-		final int TABLE_SIZE = 10000019;
+		final int TABLE_SIZE = 5000;
 		// hash table to store all instructions in the instruction file
 		LinkedList<Instructions> hashTable[] = (LinkedList<Instructions>[]) new LinkedList[TABLE_SIZE];
 		

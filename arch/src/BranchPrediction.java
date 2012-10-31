@@ -18,6 +18,10 @@ public class BranchPrediction {
 
 	public class twoBit {
 		int state;
+		
+		public twoBit()	{
+			state = 2;
+		}
 
 		public boolean predict() {
 			return state > 1;
@@ -54,7 +58,6 @@ public class BranchPrediction {
 		}
 
 		public boolean predict(long pc, boolean outcome) {
-			//pc >>= 2; // testing TODO
 			pc %= size;
 			boolean prediction = arr[(int)pc].predict();
 			meter.update(prediction == outcome);
@@ -62,7 +65,6 @@ public class BranchPrediction {
 		}
 
 		public void train(long pc, boolean outcome) {
-			//pc >>= 2; // testing TODO
 			pc %= size;
 			arr[(int)pc].train(outcome);
 		}
@@ -82,7 +84,6 @@ public class BranchPrediction {
 		}
 
 		public boolean predict(long pc, boolean outcome) {
-			// pc >>= 2; // testing TODO
 			pc %= size;
 			int r = (int)pc ^ bhr;
 			boolean prediction = arr[r].predict();
@@ -91,7 +92,6 @@ public class BranchPrediction {
 		}
 
 		public void train(long pc, boolean outcome) {
-			// pc >>= 2; // testing TODO
 			pc %= size;
 			int r = (int)pc ^ bhr;
 			if (outcome)
@@ -126,10 +126,9 @@ public class BranchPrediction {
 
 	public boolean predict(long pc, boolean outcome) {
 		int intpc = (int) pc % size;		// Don't change pc!! We need it for b.predict and g.predict as well!!
-		//intpc >>= 2; //testing TODO
 		boolean gpred = arr[intpc].g.predict(pc, outcome), // predictor 1
 		bpred = arr[intpc].b.predict(pc, outcome); // predictor 2
-		gResultQ.add(gpred); //TODO why do we need a queue?
+		gResultQ.add(gpred);
 		bResultQ.add(bpred);
 		boolean prediction = arr[intpc].c.predict() ? bpred : gpred;
 		meter.update(prediction == outcome);
@@ -138,12 +137,11 @@ public class BranchPrediction {
 
 	public void train(long pc, boolean outcome) {
 		int intpc = (int)pc % size;
-		//intpc >>= 2; //testing TODO
 		arr[intpc].g.train(pc, outcome);
 		arr[intpc].b.train(pc, outcome);
 
 		boolean bpred = bResultQ.pop();
-		arr[intpc].c.train(bpred, bpred ^ gResultQ.pop()); //TODO please explain this one 
+		arr[intpc].c.train(bpred, bpred ^ gResultQ.pop()); 
 	}
 
 }
