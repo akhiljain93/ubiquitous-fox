@@ -1,18 +1,19 @@
 public class Cache {
 	public class Set {
-		int assoc;
-		Integer[] arr;
+		int assoc, arr[];
 		boolean fifo;
 
 		public Set(int assoc, boolean fifo) {
 			this.assoc = assoc;
-			arr = new Integer[assoc];
+			arr = new int[assoc];
 			this.fifo = fifo;
+			for(int i = 0; i < assoc; ++i)
+				arr[i] = -1;
 		}
 
 		public boolean matchTag(int tag) {
 			for (int i = 0; i < assoc; i++)
-				if (arr[i] != null && (arr[i] >> 1) == tag) {
+				if (arr[i] != -1 && (arr[i] >> 1) == tag) {
 					if (!fifo) {
 						Integer a = arr[i];
 						for (int j = i - 1; j >= 0; --j)
@@ -28,7 +29,7 @@ public class Cache {
 		public boolean replace(int tag) {
 			if (matchTag(tag))
 				return false;
-			boolean modified = (arr[assoc - 1] != null)
+			boolean modified = (arr[assoc - 1] != -1)
 					&& ((arr[assoc - 1] & 1) == 1);
 			for (int j = assoc - 2; j >= 0; --j)
 				arr[j + 1] = arr[j];
@@ -39,7 +40,7 @@ public class Cache {
 		// returns true if a block was evicted and it had been modified
 		public boolean setWritten(int tag) {
 			for (int i = 0; i < assoc; i++)
-				if (arr[i] != null && (arr[i] >> 1) == tag) {
+				if (arr[i] != -1 && (arr[i] >> 1) == tag) {
 					arr[i] |= 1;
 					return false;
 				}

@@ -26,7 +26,8 @@ public class Pipeline {
 		BranchPrediction predictor = new BranchPrediction();
 		Cache cache = new Cache();
 		boolean dont_read = false;
-
+		System.err.println("Predictor and Cache initialised!");
+		
 		BufferedReader ex = new BufferedReader(new FileReader("exec_trace.txt")); // for execution trace
 		BufferedReader in = new BufferedReader(new FileReader("inst_trace.txt")); // for instruction file
 
@@ -34,12 +35,7 @@ public class Pipeline {
 		// hash table to store all instructions in the instruction file
 		LinkedList<Instructions> hashTable[] = (LinkedList<Instructions>[]) new LinkedList[TABLE_SIZE];
 		
-		// preprocessing of the inst file
-		for (int i = 0; i < TABLE_SIZE; i++)
-			hashTable[i] = new LinkedList<Instructions>();
-		
-		System.err.println("Array initialised!");
-		
+		// preprocessing of the inst file		
 		String s;
 		while ((s = in.readLine()) != null) {
 			StringTokenizer st = new StringTokenizer(s);
@@ -50,6 +46,8 @@ public class Pipeline {
 			ins.rs = Integer.parseInt(st.nextToken());
 			ins.rt = Integer.parseInt(st.nextToken());
 			ins.rd = Integer.parseInt(st.nextToken());
+			if(hashTable[key] == null)
+				hashTable[key] = new LinkedList<Instructions>();
 			hashTable[key].add(ins);
 		}
 		in.close();
@@ -131,7 +129,7 @@ public class Pipeline {
 		}
 
 		ex.close();
-		System.out.printf("%.2f %.2f%% %.2f%% %.2f%%",((double) dinst / (double) clock), cache.L1LocalMiss(), cache.L2LocalMiss(), predictor.meter.givAcc());
+		System.out.printf("%.2f %.2f%% %.2f%% %.2f%%",((double) dinst / (double) clock), cache.L1LocalMiss(), cache.L2LocalMiss(), predictor.givAcc());
 
 	}
 }

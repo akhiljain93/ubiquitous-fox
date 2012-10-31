@@ -1,19 +1,5 @@
 import java.util.LinkedList;
 
-class accuracyMeter {
-	long correct, total;
-
-	public void update(boolean precision) {
-		if (precision)
-			correct++;
-		total++;
-	}
-
-	public double givAcc() {
-		return ((double)(100 * correct) / (double)total);
-	}
-}
-
 public class BranchPrediction {
 
 	public class twoBit {
@@ -49,7 +35,6 @@ public class BranchPrediction {
 		final static int n = 10;
 		static final int size = 1 << n;
 		private twoBit arr[];
-		public accuracyMeter meter = new accuracyMeter();
 
 		public bimodal() {
 			arr = new twoBit[size];
@@ -60,7 +45,6 @@ public class BranchPrediction {
 		public boolean predict(long pc, boolean outcome) {
 			pc %= size;
 			boolean prediction = arr[(int)pc].predict();
-			meter.update(prediction == outcome);
 			return prediction;
 		}
 
@@ -75,7 +59,6 @@ public class BranchPrediction {
 		static final int size = 1 << k;
 		int bhr;
 		private twoBit arr[];
-		public accuracyMeter meter = new accuracyMeter();
 
 		public gShare() {
 			arr = new twoBit[size];
@@ -87,7 +70,6 @@ public class BranchPrediction {
 			pc %= size;
 			int r = (int)pc ^ bhr;
 			boolean prediction = arr[r].predict();
-			meter.update(prediction == outcome);
 			return prediction;
 		}
 
@@ -102,7 +84,7 @@ public class BranchPrediction {
 	}
 
 	/*********** tournament predictor ***********/
-	final static int m = 9;
+	final static int m = 5;
 	static final int size = 1 << m;
 
 	public class tournamentObject {
@@ -112,7 +94,17 @@ public class BranchPrediction {
 	}
 
 	private tournamentObject arr[];
-	public accuracyMeter meter = new accuracyMeter();
+	
+	/** accuracy meter **/
+	long correct, total;
+	public void update(boolean precision) {
+		if (precision)
+			correct++;
+		total++;
+	}
+	public double givAcc() {
+		return ((double)(100 * correct) / (double)total);
+	}
 
 	/** constructor **/
 	public BranchPrediction() {
@@ -125,18 +117,25 @@ public class BranchPrediction {
 			bResultQ = new LinkedList<Boolean>();
 
 	public boolean predict(long pc, boolean outcome) {
-		int intpc = (int) pc % size;		// Don't change pc!! We need it for b.predict and g.predict as well!!
+		
+		int intpc = (int) pc % size;
+		pc >>= m;
+		
 		boolean gpred = arr[intpc].g.predict(pc, outcome), // predictor 1
 		bpred = arr[intpc].b.predict(pc, outcome); // predictor 2
+		
 		gResultQ.add(gpred);
 		bResultQ.add(bpred);
+		
 		boolean prediction = arr[intpc].c.predict() ? bpred : gpred;
-		meter.update(prediction == outcome);
+		update(prediction == outcome);
 		return prediction;
 	}
 
 	public void train(long pc, boolean outcome) {
 		int intpc = (int)pc % size;
+		pc >>= m;
+	
 		arr[intpc].g.train(pc, outcome);
 		arr[intpc].b.train(pc, outcome);
 
