@@ -8,6 +8,10 @@ public class BranchPrediction {
 		public twoBit()	{
 			state = 2;
 		}
+		
+		public twoBit(int i)	{
+			state = i;		// TODO performs 0.6% better when gshare is initialized at 0
+		}
 
 		public boolean predict() {
 			return state > 1;
@@ -18,16 +22,6 @@ public class BranchPrediction {
 				state++;
 			else if (!outcome && state > 0)
 				state--;
-		}
-
-		/** for tournament predictor **/
-		public void train(boolean outcome, boolean change) {
-			if (change) {
-				if (outcome && state < 3)
-					state++;
-				else if (!outcome && state > 0)
-					state--;
-			}
 		}
 	}
 
@@ -83,18 +77,6 @@ public class BranchPrediction {
 		}
 	}
 
-	/*********** tournament predictor ***********/
-	final static int m = 5;
-	static final int size = 1 << m;
-
-	public class tournamentObject {
-		public twoBit c = new twoBit();
-		public gShare g = new gShare();
-		public bimodal b = new bimodal();
-	}
-
-	private tournamentObject arr[];
-	
 	/** accuracy meter **/
 	public long correct, total;
 	public void update(boolean precision) {
@@ -106,41 +88,48 @@ public class BranchPrediction {
 		return ((double)(100 * correct) / (double)total);
 	}
 
+	/*********** tournament predictor ***********/
+	final static int m = 9;
+	static final int size = 1 << m;
+
+	public gShare g = new gShare();
+	public bimodal b = new bimodal();
+	private twoBit c[];
+	
 	/** constructor **/
 	public BranchPrediction() {
-		arr = new tournamentObject[size];
+		c = new twoBit[size];
 		for (int i = 0; i < size; ++i)
-			arr[i] = new tournamentObject();
+			c[i] = new twoBit();
 	}
 
 	private LinkedList<Boolean> gResultQ = new LinkedList<Boolean>(),
-			bResultQ = new LinkedList<Boolean>();
+								bResultQ = new LinkedList<Boolean>();
 
 	public boolean predict(long pc, boolean outcome) {
 		
 		int intpc = (int) pc % size;
-		pc >>= m;
 		
-		boolean gpred = arr[intpc].g.predict(pc, outcome), // predictor 1
-		bpred = arr[intpc].b.predict(pc, outcome); // predictor 2
+		boolean gpred = g.predict(pc, outcome), // predictor 1
+				bpred = b.predict(pc, outcome); // predictor 2
 		
 		gResultQ.add(gpred);
 		bResultQ.add(bpred);
 		
-		boolean prediction = arr[intpc].c.predict() ? bpred : gpred;
+		boolean prediction = c[intpc].predict() ? bpred : gpred;
 		update(prediction == outcome);
 		return prediction;
 	}
 
 	public void train(long pc, boolean outcome) {
 		int intpc = (int)pc % size;
-		pc >>= m;
-	
-		arr[intpc].g.train(pc, outcome);
-		arr[intpc].b.train(pc, outcome);
+		
+		g.train(pc, outcome);
+		b.train(pc, outcome);
 
 		boolean bpred = bResultQ.pop();
-		arr[intpc].c.train(bpred, bpred ^ gResultQ.pop()); 
+		if(bpred ^ gResultQ.pop())
+			c[intpc].train(bpred); 
 	}
 
-}
+}                     
