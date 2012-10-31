@@ -88,8 +88,9 @@ public class Cache {
 				return 1;
 
 			// L1 is write-through
-			L2[L2tags[1]].setWritten(L2tags[0]);
-			return 9;
+			// but because of different replacement policies of l1 and l2, its possible that something might be in l1 but not in l2
+			// If so, we need to write to memory if the evicted block was modified.
+			return L2[L2tags[1]].setWritten(L2tags[0]) ? 209 : 9;
 		}
 		// not present in L1 but in L2
 		missL1++;

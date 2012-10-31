@@ -10,7 +10,7 @@ public class BranchPrediction {
 		}
 		
 		public twoBit(int i)	{
-			state = i;		// TODO performs 0.6% better when gshare is initialized at 0
+			state = i;		// TODO performs slightly better when gshare is initialized at 0
 		}
 
 		public boolean predict() {
@@ -57,7 +57,7 @@ public class BranchPrediction {
 		public gShare() {
 			arr = new twoBit[size];
 			for (int i = 0; i < size; ++i)
-				arr[i] = new twoBit();
+				arr[i] = new twoBit(0);
 		}
 
 		public boolean predict(long pc, boolean outcome) {
@@ -107,7 +107,6 @@ public class BranchPrediction {
 								bResultQ = new LinkedList<Boolean>();
 
 	public boolean predict(long pc, boolean outcome) {
-		
 		int intpc = (int) pc % size;
 		
 		boolean gpred = g.predict(pc, outcome), // predictor 1
@@ -129,7 +128,7 @@ public class BranchPrediction {
 
 		boolean bpred = bResultQ.pop();
 		if(bpred ^ gResultQ.pop())
-			c[intpc].train(bpred); 
+			c[intpc].train(bpred == outcome);
 	}
 
 }                     
