@@ -96,7 +96,7 @@ public class BranchPrediction {
 	private tournamentObject arr[];
 	
 	/** accuracy meter **/
-	long correct, total;
+	public long correct, total;
 	public void update(boolean precision) {
 		if (precision)
 			correct++;
