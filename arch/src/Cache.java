@@ -1,4 +1,7 @@
 public class Cache {
+	
+	int evictedTag = -1;  // for the sake of inclusivity
+	
 	public class Set {
 		int assoc, arr[];
 		boolean fifo;
@@ -27,10 +30,12 @@ public class Cache {
 
 		// returns true if the evicted block had been modified
 		public boolean replace(int tag) {
-			if (matchTag(tag))
+			if (matchTag(tag))	{
+				evictedTag = -1;
 				return false;
-			boolean modified = (arr[assoc - 1] != -1)
-					&& ((arr[assoc - 1] & 1) == 1);
+			}
+			boolean modified = (arr[assoc - 1] != -1) && ((arr[assoc - 1] & 1) == 1);
+			evictedTag = arr[assoc-1] >> 1;
 			for (int j = assoc - 2; j >= 0; --j)
 				arr[j + 1] = arr[j];
 			arr[0] = tag << 1;
@@ -42,11 +47,22 @@ public class Cache {
 			for (int i = 0; i < assoc; i++)
 				if (arr[i] != -1 && (arr[i] >> 1) == tag) {
 					arr[i] |= 1;
+					evictedTag = -1;
 					return false;
 				}
 			boolean wb = replace(tag);
-			setWritten(tag);
+			arr[0] |= 1;
 			return wb;
+		}
+		
+		public void evict(int tag)	{
+			int i;
+			for (i = 0; i < assoc; i++)
+				if(arr[i] != -1 && (arr[i] >> 1) == tag)
+					break;
+			for(; i+1 < assoc; i++)
+				arr[i] = arr[i+1];
+			arr[i] = -1;
 		}
 	}
 
@@ -77,6 +93,13 @@ public class Cache {
 		tag >>= 11;
 		return new int[] { tag, index, remn };
 	}
+	
+	public int[][] get4L1(int tag, int indx)	{
+		tag = (tag << 4) | (indx >> 7); // transfer first 4 bits of index to the tag. index was initially 11 bits
+		indx &= 127; // extract last 7 bits of index
+		indx <<= 2; // shift it 2 bits to the left
+		return new int[][]{new int[]{tag, indx|0}, new int[]{tag, indx|1}, new int[]{tag, indx|2}, new int[]{tag, indx|3}};
+	}
 
 	// exclusive cache - because if we have inclusive cache, we'll have to evict 128/32 = 4 (extra) blocks from L1, unnecessarily
 	public int access(long addr, boolean write) {
@@ -90,10 +113,18 @@ public class Cache {
 
 			// L1 is write-through
 			forL2++;
-			// but its possible that something might be in l1 but not in l2
-			missL2 += L2[L2tags[1]].matchTag(L2tags[0]) ? 0 : 1;
-			// If so, we need to write to memory if the evicted block was modified.
-			return L2[L2tags[1]].setWritten(L2tags[0]) ? 209 : 9;
+			
+			boolean w = L2[L2tags[1]].setWritten(L2tags[0]);
+			
+			// maintenance of inclusivity
+			if(evictedTag != -1)	{
+				int[][] evictions = get4L1(evictedTag, L2tags[1]);
+				for(int j = 0; j < evictions.length; ++j)
+					L1[evictions[j][1]].evict(evictions[j][0]);
+			}
+			
+			// We need to write to memory if the evicted block was modified.
+			return w ? 209 : 9;
 		}
 		// not present in L1 but in L2
 		missL1++;
