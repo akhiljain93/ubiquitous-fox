@@ -31,7 +31,7 @@ public class Pipeline {
 		BufferedReader ex = new BufferedReader(new FileReader("exec_trace.txt")); // for execution trace
 		BufferedReader in = new BufferedReader(new FileReader("inst_trace.txt")); // for instruction file
 
-		final int TABLE_SIZE = 5000;
+		final int TABLE_SIZE = 50000;
 		// hash table to store all instructions in the instruction file
 		LinkedList<Instructions> hashTable[] = (LinkedList<Instructions>[]) new LinkedList[TABLE_SIZE];
 		
@@ -96,12 +96,12 @@ public class Pipeline {
 
 			if (dont_read) {
 				pipe[1] = null;
-				dont_read = false;
+				if(pipe[2].type != 3) 	// TODO comment this line for only 1 bubble for branch followed by load-use
+					dont_read = false;
 			}
 
 			/******* IF ********/
-			// Load-Use hazard : stall if same register, except when the new
-			// instr. itself is load/store
+			// Load-Use hazard : stall if same register, except when the new instr. itself is load/store
 			if (pipe[0] != null && pipe[1] != null && pipe[1].type == 0) {
 				if (((pipe[0].type & 1) == 0 && (pipe[0].rs == pipe[1].rd || pipe[0].rt == pipe[1].rd)) // alu and load
 						|| (pipe[0].type == 3 && pipe[0].rs == pipe[1].rd) // branch

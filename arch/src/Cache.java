@@ -78,6 +78,7 @@ public class Cache {
 		return new int[] { tag, index, remn };
 	}
 
+	// exclusive cache - because if we have inclusive cache, we'll have to evict 128/32 = 4 (extra) blocks from L1, unnecessarily
 	public int access(long addr, boolean write) {
 		int[] L1tags = getL1tag(addr), L2tags = getL2tag(addr);
 
@@ -89,7 +90,7 @@ public class Cache {
 
 			// L1 is write-through
 			forL2++;
-			// but because of different replacement policies of l1 and l2, its possible that something might be in l1 but not in l2
+			// but its possible that something might be in l1 but not in l2
 			missL2 += L2[L2tags[1]].matchTag(L2tags[0]) ? 0 : 1;
 			// If so, we need to write to memory if the evicted block was modified.
 			return L2[L2tags[1]].setWritten(L2tags[0]) ? 209 : 9;
