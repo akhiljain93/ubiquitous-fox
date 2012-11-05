@@ -101,7 +101,6 @@ public class Cache {
 		return new int[][]{new int[]{tag, indx|0}, new int[]{tag, indx|1}, new int[]{tag, indx|2}, new int[]{tag, indx|3}};
 	}
 
-	// exclusive cache - because if we have inclusive cache, we'll have to evict 128/32 = 4 (extra) blocks from L1, unnecessarily
 	public int access(long addr, boolean write) {
 		int[] L1tags = getL1tag(addr), L2tags = getL2tag(addr);
 
