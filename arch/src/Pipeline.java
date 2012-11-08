@@ -121,7 +121,7 @@ public class Pipeline {
 			/******* MEM *******/
 			if (pipe[3] != null && pipe[3].type < 2)
 				// ? Load : Store
-				clock += pipe[3].type == 0 ? cache.access(pipe[3].mem, false) : cache.access(pipe[3].mem, true);
+				clock += pipe[3].type == 0 ? cache.accessTLB(pipe[3].mem, false) : cache.accessTLB(pipe[3].mem, true);
 			else clock++; // cycle anyways complete
 
 			if(dinst % 100000 == 0)
@@ -129,7 +129,7 @@ public class Pipeline {
 		}
 
 		ex.close();
-		System.out.printf("%.2f %.2f%% %.2f%% %.2f%%",((double) dinst / (double) clock), cache.L1LocalMiss(), cache.L2LocalMiss(), predictor.givAcc());
+		System.out.printf("%.2f %.2f%% %.2f%% %.2f%% %.2f%%",((double) dinst / (double) clock), cache.L1LocalMiss(), cache.L2LocalMiss(), (float)cache.paging.misses/(float)cache.paging.accesses,predictor.givAcc());
 
 	}
 }

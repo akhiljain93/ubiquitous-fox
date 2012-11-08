@@ -72,7 +72,7 @@ public class BranchPrediction {
 			int r = (int)pc ^ bhr;
 			if (outcome)
 				bhr += (1 << 6);
-			bhr >>= 1;
+			bhr >>>= 1;
 			arr[r].train(outcome);
 		}
 	}
