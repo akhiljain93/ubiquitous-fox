@@ -23,7 +23,6 @@ public class TLB {
 	}
 
 	PageTableLevel2 pt[] = new PageTableLevel2[size];
-
 	Row Buffer[] = new Row[size];
 	LinkedList<Row> LRUCalculator = new LinkedList<Row>();
 
@@ -61,6 +60,29 @@ public class TLB {
 					break;
 				}
 		}
+		LRUCalculator.addFirst(found);
+		found.ref = true;
+		return 30;
+	}
+
+	public int readFromTLB(long add) {
+		for (int i = 0; i < size; i++)
+			if (add == Buffer[i].va) {
+				System.out.println("TLB Hit");
+				LRUCalculator.addFirst(LRUCalculator.remove(LRUCalculator
+						.indexOf(Buffer[i])));
+				return 0;
+			}
+		System.out.println("TLB Miss");
+		int pt1 = (int) (add & 0xFFC00000) >>> 22;
+		int pt2 = (int) (add & 0x3FF000) >>> 12;
+		if (pt[pt1] == null) { // serves purpose of valid bit
+			int hardDiskAccessTime = 0;
+			System.out.println("Page Fault!!");
+			return hardDiskAccessTime;
+		}
+		System.out.println("Page Table Hit");
+		Row found = pt[pt1].table[pt2];
 		LRUCalculator.addFirst(found);
 		found.ref = true;
 		return 30;
