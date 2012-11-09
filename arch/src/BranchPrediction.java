@@ -10,7 +10,7 @@ public class BranchPrediction {
 		}
 		
 		public twoBit(int i)	{
-			state = i;		// TODO performs slightly better when gshare is initialized at 0
+			state = i;
 		}
 
 		public boolean predict() {
@@ -57,22 +57,24 @@ public class BranchPrediction {
 		public gShare() {
 			arr = new twoBit[size];
 			for (int i = 0; i < size; ++i)
-				arr[i] = new twoBit(0);
+				arr[i] = new twoBit(1);
 		}
 
 		public boolean predict(long pc, boolean outcome) {
 			pc %= size;
-			int r = (int)pc ^ bhr;
+			// better results due to this 3 bit shift
+			int r = (int)pc ^ (bhr << 3);
 			boolean prediction = arr[r].predict();
 			return prediction;
 		}
 
 		public void train(long pc, boolean outcome) {
 			pc %= size;
-			int r = (int)pc ^ bhr;
-			if (outcome)
-				bhr += (1 << 6);
+			int r = (int)pc ^ (bhr << 3);
 			bhr >>>= 1;
+			if (outcome)
+				bhr += 1 << 5;
+			bhr %= (1 << 6);
 			arr[r].train(outcome);
 		}
 	}

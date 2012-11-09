@@ -17,6 +17,17 @@ public class Pipeline {
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws IOException {
+		boolean debug = false;
+		
+		int options = 0;
+		String trace = new String("exec_trace.txt"), inst = new String("inst_trace.txt");
+		if(args.length >= 2)	{
+			trace = args[0];
+			inst = args[1];
+			options = 2;
+		}
+		if(args.length - options > 0 && (args[options] == "-d" || args[options].toLowerCase().contains("debug")))
+			debug = true;
 
 		int clock = 0; // no. of clock cycles taken
 		int bubbles = 0; // maintain a bubble counter
@@ -26,10 +37,10 @@ public class Pipeline {
 		BranchPrediction predictor = new BranchPrediction();
 		Cache cache = new Cache();
 		boolean dont_read = false;
-		System.err.println("Predictor and Cache initialised!");
+		if(debug)    System.err.println("Predictor and Cache initialised!");
 		
-		BufferedReader ex = new BufferedReader(new FileReader("exec_trace.txt")); // for execution trace
-		BufferedReader in = new BufferedReader(new FileReader("inst_trace.txt")); // for instruction file
+		BufferedReader ex = new BufferedReader(new FileReader(trace)); // for execution trace
+		BufferedReader in = new BufferedReader(new FileReader(inst)); // for instruction file
 
 		final int TABLE_SIZE = 50000;
 		// hash table to store all instructions in the instruction file
@@ -52,7 +63,7 @@ public class Pipeline {
 		}
 		in.close();
 
-		System.err.println("Instructions hashed!");
+		if(debug)    System.err.println("Instructions hashed!");
 		
 		long last = 0, dinst = 0;
 		while (last < 4) {
@@ -125,11 +136,14 @@ public class Pipeline {
 			else clock++; // cycle anyways complete
 
 			if(dinst % 100000 == 0)
-				System.err.println("No. of dynamic instructions processed: " + dinst + "; last: " + last);
+				if(debug)    System.err.println("No. of dynamic instructions processed: " + dinst + "; last: " + last);
 		}
 
 		ex.close();
-		System.out.printf("%.2f %.2f%% %.2f%% %.2f%% %.2f%%",((double) dinst / (double) clock), cache.L1LocalMiss(), cache.L2LocalMiss(), (float)cache.paging.misses/(float)cache.paging.accesses,predictor.givAcc());
-
+	
+		if(debug)
+			System.out.printf("%.2f %.2f%% %.2f%% (%.2f%%) %.2f%%\n",((double) dinst / (double) clock), cache.L1LocalMiss(), cache.L2LocalMiss(), (float)cache.paging.misses, predictor.givAcc());
+		else
+			System.out.printf("%.2f %.2f%% %.2f%% %.2f%%\n",((double) dinst / (double) clock), cache.L1LocalMiss(), cache.L2LocalMiss(), predictor.givAcc());
 	}
 }

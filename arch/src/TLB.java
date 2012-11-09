@@ -83,13 +83,8 @@ public class TLB {
 		found.ref = true;
 		
 		// write-back evicted value
-		if(del != null)	{
+		if(del != null)
 			del.ref = false;
-			if (del.dirty)	{
-				del.dirty = false;
-				return 60;
-			}
-		}
 		
 		return 30;
 	}
